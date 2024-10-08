@@ -1,0 +1,89 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Weather App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-pink-800 text-white">
+    <div id="stars-container"></div>
+
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-center text-white drop-shadow-lg">Cosmic Weather App</h1>
+        </header>
+
+        <main>
+            <div class="weather-card mb-8">
+                <div class="card-header flex justify-between items-center">
+                    <h2 id="city-name" class="text-2xl font-semibold">Loading...</h2>
+                    <button id="location-btn" class="btn btn-outline-light rounded-full">
+                        <i class="bi bi-geo-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body text-center">
+                    <div id="temperature" class="text-6xl font-bold mb-4">--°F</div>
+                    <div id="condition" class="text-xl mb-4">
+                        <i class="bi bi-cloud"></i>
+                        <span>Loading...</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-4">
+                        <div>
+                            <i class="bi bi-droplet"></i>
+                            Humidity: <span id="humidity">--%</span>
+                        </div>
+                        <div>
+                            <i class="bi bi-wind"></i>
+                            Wind: <span id="wind-speed">-- mph</span>
+                        </div>
+                    </div>
+                    <div>
+                        Air Quality: <span id="air-quality" class="font-semibold">Loading...</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="form-check form-switch flex justify-center">
+                        <input class="form-check-input" type="checkbox" id="temp-unit-switch">
+                        <label class="form-check-label ms-2" for="temp-unit-switch">°F / °C</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="weather-card mb-8">
+                <div class="card-header">
+                    <h2 class="text-xl font-semibold">5-Day Forecast</h2>
+                </div>
+                <div class="card-body">
+                    <div id="forecast" class="flex justify-between"></div>
+                </div>
+            </div>
+
+            <div class="weather-card">
+                <div class="card-body">
+                    <form id="search-form" class="flex">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-white border-opacity-50">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="city-input" class="form-control bg-transparent border-white border-opacity-50" placeholder="Enter city name">
+                        </div>
+                        <button type="submit" class="btn btn-outline-light ms-2">Search</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <footer class="mt-8 text-center text-sm opacity-80">
+            <p>&copy; 2023 Cosmic Weather App. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
