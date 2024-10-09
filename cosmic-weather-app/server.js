@@ -5,8 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Use environment variable for the API key
-const apiKey = process.env.OPENWEATHER_API_KEY; // Make sure to set this in Vercel environment variables
+const apiKey = process.env.OPENWEATHER_API_KEY; // Ensure this is set in your Vercel environment variables
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
@@ -18,24 +17,22 @@ app.get('/api/weather/:city', async (req, res) => {
 
         const response = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`);
 
-        const data = response.data;
-
         // Check if the response contains the expected data
-        if (!data || !data.list || data.list.length === 0) {
+        if (!response.data || !response.data.list || response.data.list.length === 0) {
             return res.status(404).json({ message: 'No weather data available for this city.' });
         }
 
         const weather = {
-            city: data.city.name,
-            temperature: Math.round(data.list[0].main.temp),
-            condition: data.list[0].weather[0].main,
-            description: data.list[0].weather[0].description,
-            humidity: data.list[0].main.humidity,
-            windSpeed: Math.round(data.list[0].wind.speed),
-            feelsLike: Math.round(data.list[0].main.feels_like),
-            pressure: data.list[0].main.pressure,
-            icon: data.list[0].weather[0].icon,
-            forecast: data.list.filter((item, index) => index % 8 === 0).slice(0, 5).map(item => ({
+            city: response.data.city.name,
+            temperature: Math.round(response.data.list[0].main.temp),
+            condition: response.data.list[0].weather[0].main,
+            description: response.data.list[0].weather[0].description,
+            humidity: response.data.list[0].main.humidity,
+            windSpeed: Math.round(response.data.list[0].wind.speed),
+            feelsLike: Math.round(response.data.list[0].main.feels_like),
+            pressure: response.data.list[0].main.pressure,
+            icon: response.data.list[0].weather[0].icon,
+            forecast: response.data.list.filter((item, index) => index % 8 === 0).slice(0, 5).map(item => ({
                 day: new Date(item.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' }),
                 temp: Math.round(item.main.temp),
                 icon: item.weather[0].icon
@@ -44,8 +41,11 @@ app.get('/api/weather/:city', async (req, res) => {
 
         res.json(weather);
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching weather data:', error.message);
+        
         if (error.response) {
+            console.error('Response data:', error.response.data); // Log the actual response data for debugging
+            
             if (error.response.status === 404) {
                 res.status(404).json({ message: 'City not found. Please check the spelling and try again.' });
             } else if (error.response.status === 401) {
