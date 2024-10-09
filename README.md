@@ -28,27 +28,40 @@ git clone https://github.com/yourusername/cosmic-weather-app.git
 cd cosmic-weather-app
 3.Open index.html in your web browser.
 
-Usage
-1.Enter the name of the city in the search bar.
-2.Click the search button to fetch the weather data.
-3.View the current weather, 5-day forecast, and air quality information.
+<h3>Usage</h3>
+<hr>
 
-Contributing
-Contributions are welcome! Please follow these steps to contribute:
-1.Fork the repository.
-2.Create a new branch
-git checkout -b feature/YourFeature
-3.Make your changes and commit them
-git commit -m 'Add YourFeature'
-4.Push to the branch:
-git push origin feature/YourFeature
-5.Open a pull request.
-Acknowledgments
+1.Enter the name of the city in the search bar.<br>
+
+2.Click the search button to fetch the weather data.<br>
+
+3.View the current weather, 5-day forecast, and air quality information.<br>
+
+
+<h3>Contributing</h3>
+<hr>
+Contributions are welcome! Please follow these steps to contribute:<br>
+
+1.Fork the repository.<br>
+
+2.Create a new branch<br>
+git checkout -b feature/YourFeature<br> 
+
+3.Make your changes and commit them<br>
+git commit -m 'Add YourFeature'<br>
+
+4.Push to the branch:<br>
+git push origin feature/YourFeature<br>
+
+5.Open a pull request.<br>
+
+<hr>
+<h3>Acknowledgments</h3>
 <ul><li>OpenWeatherMap for providing the weather data API.</li>
 <li>Cosmic-themed design inspiration from various sources.</li></ul>
 
-
-### Instructions for Customization:
+<hr>
+<h3>Instructions for Customization:</h3>
 
 - **Project Title**: Replace `Cosmic Weather App` with your project name if it's different.
 - **Demo Screenshot**: Add a path to a screenshot or demo image that showcases your app.
