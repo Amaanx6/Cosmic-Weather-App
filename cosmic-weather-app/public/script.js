@@ -18,9 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const favoriteCities = document.getElementById('favorite-cities');
     const addFavoriteBtn = document.getElementById('add-favorite');
     const voiceSearchBtn = document.getElementById('voice-search');
-    const feedbackButton = document.getElementById('feedback-button');
-    const feedbackForm = document.getElementById('feedback-form');
-    const userFeedbackForm = document.getElementById('user-feedback-form');
+    
 
     let isCelsius = false;
     let currentCity = '';
@@ -189,33 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
-
-    feedbackButton.addEventListener('click', () => {
-        feedbackForm.classList.toggle('hidden');
-    });
-
-    userFeedbackForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const feedbackText = document.getElementById('feedback-text').value;
-        try {
-            const response = await fetch('/api/feedback', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ feedback: feedbackText }),
-            });
-            if (!response.ok) {
-                throw new Error('Failed to submit feedback');
-            }
-            feedbackForm.classList.add('hidden');
-            alert('Thank you for your feedback!');
-        } catch (error) {
-            console.error('Error submitting feedback:', error);
-            alert('Failed to submit feedback. Please try again later.');
-        }
-    });
 
     // Load favorite cities from local storage
     loadFavoriteCities();
