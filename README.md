@@ -11,10 +11,6 @@ A simple weather application built with HTML, CSS, and JavaScript, providing use
 - **Cosmic-themed Background**: A visually appealing design that enhances user experience.
 - **Favorites**: Users can save their favorite cities for quick access.
 
-## Demo
-
-![Demo Screenshot](path/to/your/demo-screenshot.png)
-
 ## Technologies Used
 
 - HTML
