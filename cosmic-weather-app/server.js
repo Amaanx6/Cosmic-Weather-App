@@ -61,4 +61,16 @@ app.get('/api/weather/:city', async (req, res) => {
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+
+    
+catch (error) {
+    console.error('Error fetching weather data:', error.response ? error.response.data : error.message);
+    if (error.response) {
+        res.status(error.response.status).json({ message: error.response.data.message || 'An error occurred.' });
+    } else {
+        res.status(500).json({ message: 'An unexpected error occurred. Please try again later.' });
+    }
+}
+
+    
 });
