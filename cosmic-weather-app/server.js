@@ -5,7 +5,8 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const apiKey = process.env.OPENWEATHER_API_KEY; // Use the environment variable
+// Use environment variable for the API key
+const apiKey = process.env.OPENWEATHER_API_KEY; // Make sure to set this in Vercel environment variables
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
@@ -13,9 +14,16 @@ app.use(bodyParser.json());
 app.get('/api/weather/:city', async (req, res) => {
     try {
         const { city } = req.params;
+        console.log(`Fetching weather data for city: ${city}`);
+
         const response = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`);
 
         const data = response.data;
+
+        // Check if the response contains the expected data
+        if (!data || !data.list || data.list.length === 0) {
+            return res.status(404).json({ message: 'No weather data available for this city.' });
+        }
 
         const weather = {
             city: data.city.name,
