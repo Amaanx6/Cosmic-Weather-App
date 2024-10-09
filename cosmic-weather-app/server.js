@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const apiKey = '698d25b086a94443ca292fd87eb5d1bd';
+const apiKey = process.env.OPENWEATHER_API_KEY; // Use the environment variable
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
@@ -54,8 +54,6 @@ app.get('/api/weather/:city', async (req, res) => {
 app.post('/api/feedback', (req, res) => {
     const { feedback } = req.body;
     console.log('Received feedback:', feedback);
-    //  Here you would typically save the feedback to a database
-    // For now, we'll just log it and send a success response
     res.json({ message: 'Feedback received successfully' });
 });
 
