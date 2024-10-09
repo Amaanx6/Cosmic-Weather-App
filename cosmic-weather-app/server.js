@@ -1,11 +1,12 @@
 const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
+require('dotenv').config(); // Import dotenv to access environment variables
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const apiKey = process.env.OPENWEATHER_API_KEY;
+const apiKey = process.env.OPENWEATHER_API_KEY; // Use the environment variable
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
