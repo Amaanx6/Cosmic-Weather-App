@@ -59,11 +59,7 @@ app.get('/api/weather/:city', async (req, res) => {
     }
 });
 
-app.post('/api/feedback', (req, res) => {
-    const { feedback } = req.body;
-    console.log('Received feedback:', feedback);
-    res.json({ message: 'Feedback received successfully' });
-});
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
