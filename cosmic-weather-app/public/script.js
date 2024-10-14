@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const windSpeed = document.getElementById('wind-speed');
     const feelsLike = document.getElementById('feels-like');
     const pressure = document.getElementById('pressure');
+    const airQuality = document.getElementById('air-quality');
+    const sunrise = document.getElementById('sunrise');
+    const sunset = document.getElementById('sunset');
+    const visibility = document.getElementById('visibility');
+    const precipitation = document.getElementById('precipitation');
     const forecast = document.querySelector('.forecast-container');
     const searchForm = document.getElementById('search-form');
     const cityInput = document.getElementById('city-input');
@@ -23,19 +28,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackForm = document.getElementById('feedback-form');
     const userFeedbackForm = document.getElementById('user-feedback-form');
 
-    let isCelsius = true; // Default to Celsius
+    let isCelsius = true;
     let currentCity = '';
     let currentWeatherData = null;
 
-    const fetchWeather = async (city) => {
+    const fetchWeatherByCoords = async (lat, lon) => {
         showLoading();
         try {
-            const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`);
-            if (!response.ok) {
-                throw new Error('City not found. Please check the spelling and try again.');
+            const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
+            if (!weatherResponse.ok) {
+                throw new Error('Unable to fetch weather data. Please try again.');
             }
-            const data = await response.json();
-            currentWeatherData = processWeatherData(data);
+            const weatherData = await weatherResponse.json();
+
+            const airQualityResponse = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`);
+            const airQualityData = await airQualityResponse.json();
+
+            currentWeatherData = processWeatherData(weatherData, airQualityData);
             updateWeatherUI(currentWeatherData);
             currentCity = currentWeatherData.city;
             updateBackground(currentWeatherData.condition);
@@ -46,23 +55,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const processWeatherData = (data) => {
+    const fetchWeatherByCity = async (city) => {
+        showLoading();
+        try {
+            const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`);
+            if (!weatherResponse.ok) {
+                throw new Error('City not found. Please check the spelling and try again.');
+            }
+            const weatherData = await weatherResponse.json();
+
+            const airQualityResponse = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${weatherData.city.coord.lat}&lon=${weatherData.city.coord.lon}&appid=${apiKey}`);
+            const airQualityData = await airQualityResponse.json();
+
+            currentWeatherData = processWeatherData(weatherData, airQualityData);
+            updateWeatherUI(currentWeatherData);
+            currentCity = currentWeatherData.city;
+            updateBackground(currentWeatherData.condition);
+        } catch (error) {
+            showError(error.message);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    const processWeatherData = (weatherData, airQualityData) => {
+        const currentWeather = weatherData.list[0];
         return {
-            city: data.city.name,
-            temperature: Math.round(data.list[0].main.temp),
-            condition: data.list[0].weather[0].main,
-            description: data.list[0].weather[0].description,
-            humidity: data.list[0].main.humidity,
-            windSpeed: Math.round(data.list[0].wind.speed),
-            feelsLike: Math.round(data.list[0].main.feels_like),
-            pressure: data.list[0].main.pressure,
-            icon: data.list[0].weather[0].icon,
-            forecast: data.list.filter((item, index) => index % 8 === 0).slice(0, 5).map(item => ({
+            city: weatherData.city.name,
+            temperature: Math.round(currentWeather.main.temp),
+            condition: currentWeather.weather[0].main,
+            description: currentWeather.weather[0].description,
+            humidity: currentWeather.main.humidity,
+            windSpeed: Math.round(currentWeather.wind.speed),
+            feelsLike: Math.round(currentWeather.main.feels_like),
+            pressure: currentWeather.main.pressure,
+            icon: currentWeather.weather[0].icon,
+            airQuality: getAirQualityDescription(airQualityData.list[0].main.aqi),
+            sunrise: new Date(weatherData.city.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            sunset: new Date(weatherData.city.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            visibility: (currentWeather.visibility / 1000).toFixed(1),
+            precipitation: (currentWeather.rain && currentWeather.rain['3h']) || 0,
+            forecast: weatherData.list.filter((item, index) => index % 8 === 0).slice(0, 5).map(item => ({
                 day: new Date(item.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' }),
                 temp: Math.round(item.main.temp),
                 icon: item.weather[0].icon
             }))
         };
+    };
+
+    const getAirQualityDescription = (aqi) => {
+        const descriptions = ['Good', 'Fair', 'Moderate', 'Poor', 'Very Poor'];
+        return descriptions[aqi - 1] || 'Unknown';
     };
 
     const updateWeatherUI = (data) => {
@@ -74,6 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
         windSpeed.textContent = `${data.windSpeed} m/s`;
         updateFeelsLike(data.feelsLike);
         pressure.textContent = `${data.pressure} hPa`;
+        airQuality.textContent = data.airQuality;
+        sunrise.textContent = data.sunrise;
+        sunset.textContent = data.sunset;
+        visibility.textContent = `${data.visibility} km`;
+        precipitation.textContent = `${data.precipitation} mm`;
 
         forecast.innerHTML = data.forecast.map(day => `
             <div class="forecast-item">
@@ -102,7 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const getWeatherIconClass = (iconCode) => {
         const iconMap = {
-            '01d': 'fas fa-sun',
             '01n': 'fas fa-moon',
             '02d': 'fas fa-cloud-sun',
             '02n': 'fas fa-cloud-moon',
@@ -164,19 +211,54 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const initVoiceSearch = () => {
-        if (annyang) {
-            const commands = {
-                'search for *city': function(city) {
-                    cityInput.value = city;
-                    searchForm.dispatchEvent(new Event('submit'));
-                }
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                voiceSearchBtn.classList.add('listening');
             };
 
-            annyang.addCommands(commands);
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                cityInput.value = transcript;
+                searchForm.dispatchEvent(new Event('submit'));
+            };
+
+            recognition.onend = () => {
+                voiceSearchBtn.classList.remove('listening');
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                voiceSearchBtn.classList.remove('listening');
+            };
 
             voiceSearchBtn.addEventListener('click', () => {
-                annyang.start();
+                recognition.start();
             });
+        } else {
+            console.log('Web Speech API is not supported in this browser.');
+            voiceSearchBtn.style.display = 'none';
+        }
+    };
+
+    const getUserLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    fetchWeatherByCoords(position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                    console.error("Error getting user location:", error);
+                    fetchWeatherByCity('Hyderabad');
+                }
+            );
+        } else {
+            console.error("Geolocation is not supported by this browser.");
+            fetchWeatherByCity('Hyderabad');
         }
     };
 
@@ -184,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const city = cityInput.value.trim();
         if (city) {
-            fetchWeather(city);
+            fetchWeatherByCity(city);
             cityInput.value = '';
         }
     });
@@ -205,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     favoriteCities.addEventListener('click', (e) => {
         if (e.target.classList.contains('favorite-city')) {
-            fetchWeather(e.target.textContent);
+            fetchWeatherByCity(e.target.textContent);
         }
     });
 
@@ -246,6 +328,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize voice search
     initVoiceSearch();
 
-    // Initial weather fetch
-    fetchWeather('Hyderabad');
+    // Get user location or use default city
+    getUserLocation();
 });
