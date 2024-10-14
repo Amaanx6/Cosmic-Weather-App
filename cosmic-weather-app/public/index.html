@@ -33,7 +33,7 @@
                         <i id="weather-icon" class="fas fa-sun"></i>
                         <div class="temperature">
                             <span id="temperature">--</span>
-                            <span class="unit">°F</span>
+                            <span class="unit">°C</span>
                         </div>
                     </div>
                     <p id="condition">Loading...</p>
@@ -44,7 +44,7 @@
                         </div>
                         <div class="detail-item">
                             <i class="fas fa-wind" aria-hidden="true"></i>
-                            <span>Wind: <span id="wind-speed">-- mph</span></span>
+                            <span>Wind: <span id="wind-speed">-- m/s</span></span>
                         </div>
                         <div class="detail-item">
                             <i class="fas fa-thermometer-half" aria-hidden="true"></i>
@@ -53,6 +53,26 @@
                         <div class="detail-item">
                             <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
                             <span>Pressure: <span id="pressure">-- hPa</span></span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-leaf" aria-hidden="true"></i>
+                            <span>Air Quality: <span id="air-quality">--</span></span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-sun" aria-hidden="true"></i>
+                            <span>Sunrise: <span id="sunrise">--:--</span></span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-moon" aria-hidden="true"></i>
+                            <span>Sunset: <span id="sunset">--:--</span></span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-eye" aria-hidden="true"></i>
+                            <span>Visibility: <span id="visibility">-- km</span></span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-cloud-rain" aria-hidden="true"></i>
+                            <span>Precipitation: <span id="precipitation">-- mm</span></span>
                         </div>
                     </div>
                 </div>
@@ -73,7 +93,7 @@
             <label class="switch" for="temp-unit-switch">
                 <input type="checkbox" id="temp-unit-switch">
                 <span class="slider round"></span>
-                <span class="unit-label">°F</span>
+                <span class="unit-label">°C</span>
             </label>
         </footer>
     </div>
@@ -85,7 +105,6 @@
         </form>
     </div>
     <button id="feedback-button" aria-label="Provide feedback">Feedback</button>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
