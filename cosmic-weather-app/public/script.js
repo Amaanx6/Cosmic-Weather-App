@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const airQualityData = await airQualityResponse.json();
 
             currentWeatherData = processWeatherData(weatherData, airQualityData);
+            
             updateWeatherUI(currentWeatherData);
             currentCity = currentWeatherData.city;
             updateBackground(currentWeatherData.condition);
@@ -97,8 +98,13 @@ document.addEventListener('DOMContentLoaded', () => {
             precipitation: (currentWeather.rain && currentWeather.rain['3h']) || 0,
             forecast: weatherData.list.filter((item, index) => index % 8 === 0).slice(0, 5).map(item => ({
                 day: new Date(item.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' }),
+                date: new Date(item.dt * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                 temp: Math.round(item.main.temp),
-                icon: item.weather[0].icon
+                icon: item.weather[0].icon,
+                description: item.weather[0].description,
+                humidity: item.main.humidity,
+                windSpeed: Math.round(item.wind.speed),
+                pressure: item.main.pressure
             }))
         };
     };
@@ -123,13 +129,42 @@ document.addEventListener('DOMContentLoaded', () => {
         visibility.textContent = `${data.visibility} km`;
         precipitation.textContent = `${data.precipitation} mm`;
 
-        forecast.innerHTML = data.forecast.map(day => `
-            <div class="forecast-item">
-                <p>${day.day}</p>
-                <i class="${getWeatherIconClass(day.icon)}"></i>
-                <p>${convertTemperature(day.temp)}°${isCelsius ? 'C' : 'F'}</p>
+        forecast.innerHTML = data.forecast.map((day, index) => `
+            <div class="forecast-item" data-index="${index}">
+                <div class="forecast-item-header">
+                    <span>${day.day}, ${day.date}</span>
+                    <span>${convertTemperature(day.temp)}°${isCelsius ? 'C' : 'F'}</span>
+                    <i class="${getWeatherIconClass(day.icon)}"></i>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="forecast-item-details">
+                    <ul>
+                        <li><span>Description:</span> <span>${day.description}</span></li>
+                        <li><span>Humidity:</span> <span>${day.humidity}%</span></li>
+                        <li><span>Wind Speed:</span> <span>${day.windSpeed} m/s</span></li>
+                        <li><span>Pressure:</span> <span>${day.pressure} hPa</span></li>
+                    </ul>
+                </div>
             </div>
         `).join('');
+
+        // Add click event listeners to forecast items
+        document.querySelectorAll('.forecast-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Prevent the click event from bubbling up
+                e.stopPropagation();
+                
+                // Toggle the active class on the clicked item
+                item.classList.toggle('active');
+                
+                // Close other open items
+                document.querySelectorAll('.forecast-item').forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+            });
+        });
     };
 
     const updateTemperature = (temp) => {
@@ -150,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const getWeatherIconClass = (iconCode) => {
         const iconMap = {
+            '01d': 'fas fa-sun',
             '01n': 'fas fa-moon',
             '02d': 'fas fa-cloud-sun',
             '02n': 'fas fa-cloud-moon',
