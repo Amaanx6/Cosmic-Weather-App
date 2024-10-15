@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const updateFeelsLike = (temp) => {
-        feelsLike.textContent = `${convertTemperature(temp)}°${isCelsius ? 'C' : 'F'}`;
+        feelsLike.textContent = `${convertTemperature(temp)}°${isCelsius ? 'C' : '°F'}`;
     };
 
     const convertTemperature = (temp) => {
@@ -229,7 +229,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadFavoriteCities = () => {
         const favorites = JSON.parse(localStorage.getItem('favoriteCities')) || [];
         favoriteCities.innerHTML = favorites.map(city => `
-            <div class="favorite-city">${city}</div>
+            <div class="favorite-city">
+                <span>${city}</span>
+                <button class="remove-favorite" data-city="${city}">×</button>
+            </div>
         `).join('');
     };
 
@@ -240,6 +243,13 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('favoriteCities', JSON.stringify(favorites));
             loadFavoriteCities();
         }
+    };
+
+    const removeFavoriteCity = (city) => {
+        let favorites = JSON.parse(localStorage.getItem('favoriteCities')) || [];
+        favorites = favorites.filter(fav => fav !== city);
+        localStorage.setItem('favoriteCities', JSON.stringify(favorites));
+        loadFavoriteCities();
     };
 
     const updateBackground = (condition) => {
@@ -322,8 +332,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     favoriteCities.addEventListener('click', (e) => {
-        if (e.target.classList.contains('favorite-city')) {
-            fetchWeatherByCity(e.target.textContent);
+        if (e.target.classList.contains('remove-favorite')) {
+            const city = e.target.getAttribute('data-city');
+            removeFavoriteCity(city);
+        } else if (e.target.closest('.favorite-city')) {
+            const cityName = e.target.closest('.favorite-city').querySelector('span').textContent;
+            fetchWeatherByCity(cityName);
         }
     });
 
@@ -349,6 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isCelsius = savedUnit === 'celsius';
         tempUnitSwitch.checked = !isCelsius;
         unitLabel.textContent = isCelsius ? '°C' : '°F';
+    
     } else {
         // Set default to Celsius
         isCelsius = true;
